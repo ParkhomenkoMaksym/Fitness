@@ -6,9 +6,7 @@ using System.Threading.Tasks;
 
 namespace CodeBlogFitnessBL.Model
 {
-    /// <summary>
-    /// Gender.
-    /// </summary>
+    [Serializable]
     public class Gender
     {
         /// <summary>

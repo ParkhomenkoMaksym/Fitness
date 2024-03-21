@@ -8,7 +8,7 @@ using System.Xml.Linq;
 
 namespace CodeBlogFitnessBL.Model
 {
-    
+    [Serializable]
     public class User
     {
         #region Properties
