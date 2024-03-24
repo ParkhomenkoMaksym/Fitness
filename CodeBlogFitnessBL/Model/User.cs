@@ -20,12 +20,12 @@ namespace CodeBlogFitnessBL.Model
         /// <summary>
         /// Gender.
         /// </summary>
-        public Gender Gender { get; }
+        public Gender Gender { get; set; }
 
         /// <summary>
         /// Birthday.
         /// </summary>
-        public DateTime BirthDate { get; }
+        public DateTime BirthDate { get; set; }
 
         /// <summary>
         /// Weight.
@@ -36,6 +36,12 @@ namespace CodeBlogFitnessBL.Model
         /// Height
         /// </summary>
         public double Height { get; set; }
+
+        //DateTime nowDate = DateTime.Today;
+        //int age = nowDate.Year - birthDate.Year;
+        //if(birthDate > nowDate.AddYears(-age)) age --;
+
+        public int Age { get { return DateTime.Now.Year - BirthDate.Year; } }
         #endregion
         /// <summary>
         /// Creat a new user
@@ -82,9 +88,17 @@ namespace CodeBlogFitnessBL.Model
             Weight = weight;
             Height = height;
         }
+        public User(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentNullException("The name of user can't be null", nameof(name));
+            }
+            Name = name;
+        }
         public override string ToString()
         {
-            return Name;
+            return Name + " " + Age;
         }
     }
 }

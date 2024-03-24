@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics.Eventing.Reader;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -18,19 +19,48 @@ namespace CodeBlogFitnessBL.Controller
         /// <summary>
         /// user of app.
         /// </summary>
-        public User User {  get; }
+        public List<User> Users { get; } //IEnumerable
+
+        public User CurrentUser { get; }
+
+        public bool IsNewUser { get; } = false;
 
         /// <summary>
         /// Create a new controller of user.
         /// </summary>
         /// <param name="user"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        public UserController(string userName, string genderName,DateTime birthday, double weight, double height )
+        public UserController(string userName)
         {
             // TODO Check
-            var gender = new Gender(genderName);
-            User = new User(userName, gender, birthday, weight, height);
+            if (string.IsNullOrWhiteSpace(userName))
+            {
+                throw new ArgumentNullException("The name of user can't be null", nameof(userName));
+            }
+
+            Users = GetUsersData();
+
+            CurrentUser = Users.SingleOrDefault(u => u.Name == userName);
+
+            if (CurrentUser == null)
+            {
+                CurrentUser = new User(userName);
+                Users.Add(CurrentUser);
+                IsNewUser = true;
+                Save();
+            }
+            //var gender = new Gender(genderName);
+            //Users = new List<User>() { userName, gender, birthday, weight, height };
            
+        }
+        public void SetNewUsersData(string genderName, DateTime birthDate, double weight = 1, double height = 1) 
+        {
+            //Check
+            CurrentUser.Gender = new Gender(genderName);
+            CurrentUser.BirthDate = birthDate;  
+            CurrentUser.Weight = weight;
+            CurrentUser.Height = height;
+            Save();
         }
         /// <summary>
         /// Save all data of user
@@ -41,25 +71,31 @@ namespace CodeBlogFitnessBL.Controller
 
             using(var fs = new FileStream("user.dat", FileMode.OpenOrCreate))
             {
-                formatter.Serialize(fs, User);   
+                formatter.Serialize(fs, Users);   
             }
         }
         /// <summary>
-        /// Get a data of user
+        /// Get a save List of user
         /// </summary>
         /// <returns></returns>
         /// <exception cref="FileLoadException"></exception>
-        public UserController() 
+        private List<User> GetUsersData() 
         {
             var formatter = new BinaryFormatter();
             using (var fs = new FileStream("user.dat", FileMode.OpenOrCreate))
             {
-                if(formatter.Deserialize(fs) is User user)
+                if(formatter.Deserialize(fs) is List<User> users)
                 {
-                    User = user;
+                    return users;
+                }
+                else 
+                {
+                    return new List<User>();
                 }
                 // TODO: What do I do if a user don't read?
             }
+            
+            
         }
     }
 }
