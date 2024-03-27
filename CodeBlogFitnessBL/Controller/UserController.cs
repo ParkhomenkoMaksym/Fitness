@@ -14,8 +14,9 @@ namespace CodeBlogFitnessBL.Controller
         /// <summary>
         /// Controller of user.
         /// </summary>
-    public class UserController
+    public class UserController : ControllerBase
     {
+        private const string USERS_FILE_NAME = "user.dat";
         /// <summary>
         /// user of app.
         /// </summary>
@@ -67,12 +68,7 @@ namespace CodeBlogFitnessBL.Controller
         /// </summary>
         public void Save()
         {
-            var formatter = new BinaryFormatter();
-
-            using(var fs = new FileStream("user.dat", FileMode.OpenOrCreate))
-            {
-                formatter.Serialize(fs, Users);   
-            }
+            Save(USERS_FILE_NAME, Users);
         }
         /// <summary>
         /// Get a save List of user
@@ -81,21 +77,7 @@ namespace CodeBlogFitnessBL.Controller
         /// <exception cref="FileLoadException"></exception>
         private List<User> GetUsersData() 
         {
-            var formatter = new BinaryFormatter();
-            using (var fs = new FileStream("user.dat", FileMode.OpenOrCreate))
-            {
-                if(formatter.Deserialize(fs) is List<User> users)
-                {
-                    return users;
-                }
-                else 
-                {
-                    return new List<User>();
-                }
-                // TODO: What do I do if a user don't read?
-            }
-            
-            
+            return Load<List<User>>(USERS_FILE_NAME) ?? new List<User>();  
         }
     }
 }
